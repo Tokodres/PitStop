@@ -1,7 +1,8 @@
 package com.example.pitstop.modelo
+import com.example.pitstop.controlador.PistaController
 import java.time.LocalDateTime
 
-class Parada(
+data class Pista(
     val piloto: Piloto,
     val escuderia: Escuderia,
     val tiempoSegundos: Int,
@@ -9,5 +10,6 @@ class Parada(
     val estado: Estado,
     val motivoFallo: String?,
     val mecanico: Mecanico,
-    val fechaHora: LocalDateTime
+    val fecha: Long            // 🔸 antes era LocalDateTime
 )
+

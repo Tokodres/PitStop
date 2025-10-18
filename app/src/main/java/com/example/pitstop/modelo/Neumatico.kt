@@ -1,6 +1,7 @@
 package com.example.pitstop.modelo
 
-class Neumatico(
+data class Neumatico(
     val nombre: String,
     val cantidad: Int
 )
+
