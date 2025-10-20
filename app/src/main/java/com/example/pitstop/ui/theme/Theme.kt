@@ -1,57 +1,58 @@
-package com.example.pitstop.theme
+package com.example.pitstop.ui.theme
 
+import android.app.Activity
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 
-// Colores personalizados
-private val RedPrimary = Color(0xFFD32F2F)
-private val RedDark = Color(0xFFB71C1C)
-private val GrayLight = Color(0xFFF5F5F5)
-private val GrayDark = Color(0xFF212121)
-private val White = Color(0xFFFFFFFF)
-private val Black = Color(0xFF000000)
-private val GreenOk = Color(0xFF4CAF50)
-
-// Paleta de colores para modo claro
-private val LightColors = lightColorScheme(
-    primary = RedPrimary,
-    onPrimary = White,
-    secondary = RedDark,
-    onSecondary = White,
-    background = GrayLight,
-    onBackground = Black,
-    surface = White,
-    onSurface = Black,
-    error = Color(0xFFD50000),
+private val DarkColorScheme = darkColorScheme(
+    primary = Purple80,
+    secondary = PurpleGrey80,
+    tertiary = Pink80
 )
 
-// Paleta de colores para modo oscuro
-private val DarkColors = darkColorScheme(
-    primary = RedDark,
-    onPrimary = White,
-    secondary = RedPrimary,
-    onSecondary = White,
-    background = GrayDark,
-    onBackground = White,
-    surface = GrayDark,
-    onSurface = White,
-    error = Color(0xFFFF5252),
+private val LightColorScheme = lightColorScheme(
+    primary = Purple40,
+    secondary = PurpleGrey40,
+    tertiary = Pink40
+
+    /* Other default colors to override
+    background = Color(0xFFFFFBFE),
+    surface = Color(0xFFFFFBFE),
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onTertiary = Color.White,
+    onBackground = Color(0xFF1C1B1F),
+    onSurface = Color(0xFF1C1B1F),
+    */
 )
 
-// Tema principal de la app
 @Composable
 fun PitStopTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    // Dynamic color is available on Android 12+
+    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colors = if (darkTheme) DarkColors else LightColors
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+
+        darkTheme -> DarkColorScheme
+        else -> LightColorScheme
+    }
 
     MaterialTheme(
-        colorScheme = colors,
-        typography = Typography(),
-        shapes = Shapes(),
+        colorScheme = colorScheme,
+        typography = Typography,
         content = content
     )
 }

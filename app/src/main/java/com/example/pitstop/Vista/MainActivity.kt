@@ -1,36 +1,48 @@
-package com.example.pitstop
+package com.example.pitstop.vista
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.pitstop.controlador.PitStopController
-import com.example.pitstop.theme.PitStopTheme
-import com.example.pitstop.vista.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val controlador = PitStopController()
-
-        setContent {
-            PitStopTheme {
-                NavegacionPitStop(controlador)
-            }
+@Composable
+fun MenuPrincipal(onNavegarRegistrar: () -> Unit, onNavegarLista: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("PitStop — Menú Principal", style = MaterialTheme.typography.titleLarge)
+        Spacer(Modifier.height(32.dp))
+        Button(onClick = onNavegarRegistrar, modifier = Modifier.fillMaxWidth()) {
+            Text("Registrar Parada")
+        }
+        Spacer(Modifier.height(16.dp))
+        Button(onClick = onNavegarLista, modifier = Modifier.fillMaxWidth()) {
+            Text("Ver Listado de Paradas")
         }
     }
 }
 
-@Composable
-fun NavegacionPitStop(controlador: PitStopController) {
-    val navController = rememberNavController()
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            var pantalla by remember { mutableStateOf("menu") }
 
-    NavHost(navController, startDestination = "inicio") {
-        composable("inicio") { PantallaResumen(navController, controlador) }
-        composable("listado") { PantallaListado(navController, controlador) }
-        composable("registro") { PantallaRegistro(navController, controlador) }
+            when (pantalla) {
+                "menu" -> MenuPrincipal(
+                    onNavegarRegistrar = { pantalla = "registrar" },
+                    onNavegarLista = { pantalla = "lista" }
+                )
+                "registrar" -> RegistrarParada(onVolver = { pantalla = "menu" }, this)
+                "lista" -> ListaParadas(onVolver = { pantalla = "menu" }, this)
+            }
+        }
     }
 }

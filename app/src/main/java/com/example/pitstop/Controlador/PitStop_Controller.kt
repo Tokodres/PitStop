@@ -1,36 +1,35 @@
 package com.example.pitstop.controlador
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.example.pitstop.modelo.Parada
-import kotlin.math.roundToInt
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
-class PitStopController {
+class PitStop_Controller(context: Context) {
 
-    private val listaParadas = mutableListOf<Parada>()
+    private val prefs: SharedPreferences =
+        context.getSharedPreferences("pitstop_prefs", Context.MODE_PRIVATE)
 
-    fun registrarParada(parada: Parada) {
-        listaParadas.add(parada)
+    private val gson = Gson()
+
+    fun guardarParada(parada: Parada) {
+        val lista = obtenerParadas().toMutableList()
+        lista.add(parada)
+        val json = gson.toJson(lista)
+        prefs.edit().putString("paradas", json).apply()
     }
 
-    fun eliminarParada(index: Int) {
-        if (index in listaParadas.indices) {
-            listaParadas.removeAt(index)
+    fun obtenerParadas(): List<Parada> {
+        val json = prefs.getString("paradas", null)
+        if (json != null) {
+            val type = object : TypeToken<List<Parada>>() {}.type
+            return gson.fromJson(json, type)
         }
+        return emptyList()
     }
 
-    fun obtenerParadas(): List<Parada> = listaParadas
-
-    fun buscarParadas(nombrePiloto: String): List<Parada> {
-        return listaParadas.filter {
-            it.piloto.nombre.contains(nombrePiloto, ignoreCase = true)
-        }
-    }
-
-    fun obtenerResumen(): Triple<Double, Double, Int> {
-        if (listaParadas.isEmpty()) return Triple(0.0, 0.0, 0)
-        val tiempos = listaParadas.map { it.tiempoSegundos }
-        val masRapido = tiempos.minOrNull()?.toDouble() ?: 0.0
-        val promedio = (tiempos.average() * 100.0).roundToInt() / 100.0
-        val total = listaParadas.size
-        return Triple(masRapido, promedio, total)
+    fun limpiarDatos() {
+        prefs.edit().clear().apply()
     }
 }
