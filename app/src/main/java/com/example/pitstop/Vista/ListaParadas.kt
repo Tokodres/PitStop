@@ -1,22 +1,17 @@
 package com.example.pitstop.vista
 
-import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.pitstop.controlador.PitStop_Controller
 import com.example.pitstop.modelo.Parada
 
 @Composable
-fun ListaParadas(onVolver: () -> Unit, context: Context) {
-    val controller = remember { PitStop_Controller(context) }
+fun ListaParadasScreen(controller: PitStop_Controller, onVolver: () -> Unit) {
     val paradas = remember { mutableStateListOf<Parada>() }
 
     LaunchedEffect(Unit) {
@@ -32,17 +27,25 @@ fun ListaParadas(onVolver: () -> Unit, context: Context) {
             Text("No hay paradas registradas.")
         } else {
             LazyColumn {
-                items(paradas) { parada ->
+                items(paradas.indices.toList()) { index ->
+                    val parada = paradas[index]
                     Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                         Column(modifier = Modifier.padding(8.dp)) {
                             Text("Piloto: ${parada.piloto.nombre}")
                             Text("Escudería: ${parada.escuderia.nombre}")
                             Text("Tiempo: ${parada.tiempoSegundos} seg")
-                            Text("Neumático: ${parada.neumatico.nombre} (${parada.neumatico.cantidad})")
+                            Text("Neumático: ${parada.neumatico.tipo} (${parada.neumatico.cantidad})")
                             Text("Estado: ${parada.estado.tipoEstado}")
-                            parada.motivoFallo?.let { Text("Fallo: $it") }
+                            parada.observacion?.let { Text("Observación: $it") }
                             Text("Mecánico: ${parada.mecanico.nombre}")
-                            Text("Fecha: ${parada.fechaHora}")
+                            Text("Fecha: ${parada.fecha}")
+                            Spacer(Modifier.height(8.dp))
+                            Button(onClick = {
+                                controller.eliminarParada(index)
+                                paradas.removeAt(index)
+                            }, modifier = Modifier.fillMaxWidth()) {
+                                Text("Eliminar")
+                            }
                         }
                     }
                 }

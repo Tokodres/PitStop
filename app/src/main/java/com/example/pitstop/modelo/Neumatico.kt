@@ -1,6 +1,6 @@
 package com.example.pitstop.modelo
 
 data class Neumatico(
-    val nombre: String,
-    val cantidad: Int
+    val tipo: String,          // tipo de neumático: "Soft", "Hard", etc.
+    val cantidad: Int          // cantidad de neumáticos cambiados
 )

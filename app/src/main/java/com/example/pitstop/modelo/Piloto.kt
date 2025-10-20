@@ -1,4 +1,5 @@
 package com.example.pitstop.modelo
 
-class Piloto(nombre: String) : Persona(nombre) {
-}
+data class Piloto(
+    val nombre: String
+)

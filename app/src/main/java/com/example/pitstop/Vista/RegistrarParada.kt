@@ -1,169 +1,165 @@
 package com.example.pitstop.vista
 
-import android.content.Context
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.pitstop.controlador.PitStop_Controller
-import com.example.pitstop.controlador.RegistrarParadaController
 import com.example.pitstop.modelo.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-
 
 @Composable
-fun RegistrarParada(onVolver: () -> Unit, context: Context) {
-    val controller = remember { PitStop_Controller(context) }
-    val registrarController = remember { RegistrarParadaController() }
-
-    // --- Obtener opciones desde el controlador de registro ---
-    val pilotosOpciones = registrarController.getPilotos()
-    val escuderiasOpciones = registrarController.getEscuderias()
-    val neumaticoOpciones = registrarController.getNeumaticos()
-    val estadoOpciones = registrarController.getEstados()
-
-    // --- Estados de los campos ---
-    var piloto by remember { mutableStateOf(pilotosOpciones.first()) }
-    var escuderia by remember { mutableStateOf(escuderiasOpciones.first()) }
-    var neumatico by remember { mutableStateOf(neumaticoOpciones.first()) }
-    var cantidadNeumaticos by remember { mutableStateOf("0") }
-    var estado by remember { mutableStateOf(estadoOpciones.first()) }
-    var motivoFallo by remember { mutableStateOf("") }
-    var mecanico by remember { mutableStateOf("") }
+fun RegistrarParadaScreen(controller: PitStop_Controller, onVolver: () -> Unit) {
+    // Variables de estado
+    var nombrePiloto by remember { mutableStateOf("") }
+    var nombreMecanico by remember { mutableStateOf("") }
+    var nombreEscuderia by remember { mutableStateOf("") }
+    var tipoNeumatico by remember { mutableStateOf("") }
+    var cantidadNeumaticos by remember { mutableStateOf("") }
+    var tipoEstado by remember { mutableStateOf("") }
+    var observacion by remember { mutableStateOf("") }
     var tiempoSegundos by remember { mutableStateOf("") }
-    var fechaHora by remember { mutableStateOf("") } // Editable por el usuario
+    var fechaManual by remember { mutableStateOf("") }
 
+    // Contenedor principal centrado
     Column(
         modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Registrar Pit Stop", style = MaterialTheme.typography.titleLarge)
-        Spacer(Modifier.height(12.dp))
+        // Título principal
+        Text(
+            text = "Registrar Pit Stop",
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
 
-        // --- Dropdown de Piloto ---
-        Text("Piloto")
-        DropdownSelector(pilotosOpciones, piloto) { piloto = it }
+        Spacer(Modifier.height(20.dp))
 
-        // --- Dropdown de Escudería ---
-        Text("Escudería")
-        DropdownSelector(escuderiasOpciones, escuderia) { escuderia = it }
+        // Campos de entrada
+        OutlinedTextField(
+            value = nombrePiloto,
+            onValueChange = { nombrePiloto = it },
+            label = { Text("Piloto") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(8.dp))
 
-        // --- Tiempo en segundos ---
+        OutlinedTextField(
+            value = nombreEscuderia,
+            onValueChange = { nombreEscuderia = it },
+            label = { Text("Escudería") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(8.dp))
+
         OutlinedTextField(
             value = tiempoSegundos,
             onValueChange = { tiempoSegundos = it },
-            label = { Text("Tiempo (segundos)") },
+            label = { Text("Tiempo Total (s)") },
             modifier = Modifier.fillMaxWidth()
         )
+        Spacer(Modifier.height(8.dp))
 
-        // --- Dropdown de Neumático ---
-        Text("Cambio de neumático")
-        DropdownSelector(neumaticoOpciones, neumatico) { neumatico = it }
+        OutlinedTextField(
+            value = tipoNeumatico,
+            onValueChange = { tipoNeumatico = it },
+            label = { Text("Cambio de Neumáticos") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(8.dp))
 
-        // --- Cantidad de neumáticos ---
         OutlinedTextField(
             value = cantidadNeumaticos,
             onValueChange = { cantidadNeumaticos = it },
-            label = { Text("Cantidad de neumáticos") },
+            label = { Text("Número de Neumáticos Cambiados") },
             modifier = Modifier.fillMaxWidth()
         )
+        Spacer(Modifier.height(8.dp))
 
-        // --- Dropdown de Estado ---
-        Text("Estado")
-        DropdownSelector(estadoOpciones, estado) { estado = it }
-
-        // --- Motivo de fallo ---
         OutlinedTextField(
-            value = motivoFallo,
-            onValueChange = { motivoFallo = it },
-            label = { Text("Motivo de fallo (opcional)") },
+            value = tipoEstado,
+            onValueChange = { tipoEstado = it },
+            label = { Text("Estado (OK / Fallido)") },
             modifier = Modifier.fillMaxWidth()
         )
+        Spacer(Modifier.height(8.dp))
 
-        // --- Mecánico ---
         OutlinedTextField(
-            value = mecanico,
-            onValueChange = { mecanico = it },
-            label = { Text("Mecánico") },
+            value = observacion,
+            onValueChange = { observacion = it },
+            label = { Text("Motivo del fallo (opcional)") },
             modifier = Modifier.fillMaxWidth()
         )
+        Spacer(Modifier.height(8.dp))
 
-        // --- Fecha y hora editable ---
         OutlinedTextField(
-            value = fechaHora,
-            onValueChange = { fechaHora = it },
-            label = { Text("Fecha y hora (dd/MM/yyyy HH:mm)") },
+            value = nombreMecanico,
+            onValueChange = { nombreMecanico = it },
+            label = { Text("Mecánico Principal") },
             modifier = Modifier.fillMaxWidth()
         )
+        Spacer(Modifier.height(8.dp))
 
+        OutlinedTextField(
+            value = fechaManual,
+            onValueChange = { fechaManual = it },
+            label = { Text("Fecha y hora del Pit Stop (dd/MM/yyyy HH:mm)") },
+            modifier = Modifier.fillMaxWidth()
+        )
         Spacer(Modifier.height(16.dp))
-        Button(
-            onClick = {
-                if (piloto.isNotBlank() && escuderia.isNotBlank() && fechaHora.isNotBlank()) {
-                    val parada = Parada(
-                        piloto = Piloto(piloto),
-                        escuderia = Escuderia(escuderia),
-                        tiempoSegundos = tiempoSegundos.toIntOrNull() ?: 0,
-                        neumatico = Neumatico(neumatico, cantidadNeumaticos.toIntOrNull() ?: 0),
-                        estado = Estado(estado),
-                        motivoFallo = if (motivoFallo.isBlank()) null else motivoFallo,
-                        mecanico = Mecanico(mecanico),
-                        fechaHora = fechaHora
-                    )
-                    controller.guardarParada(parada)
-                    onVolver()
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Guardar Parada")
-        }
 
-        Spacer(Modifier.height(12.dp))
-        Button(
-            onClick = onVolver,
+        // Fila de botones
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Volver al menú")
-        }
-    }
-}
+            // Botón GUARDAR (rojo)
+            Button(
+                onClick = {
+                    if (nombrePiloto.isNotBlank() && fechaManual.isNotBlank()) {
+                        val parada = Parada(
+                            piloto = Piloto(nombrePiloto),
+                            escuderia = Escuderia(nombreEscuderia),
+                            tiempoSegundos = tiempoSegundos.toIntOrNull() ?: 0,
+                            neumatico = Neumatico(
+                                tipo = tipoNeumatico,
+                                cantidad = cantidadNeumaticos.toIntOrNull() ?: 0
+                            ),
+                            estado = Estado(tipoEstado),
+                            observacion = if (observacion.isBlank()) null else observacion,
+                            mecanico = Mecanico(nombreMecanico),
+                            fecha = fechaManual
+                        )
 
-@Composable
-fun DropdownSelector(opciones: List<String>, seleccionActual: String, onSeleccion: (String) -> Unit) {
-    var expandir by remember { mutableStateOf(false) }
-    Box(modifier = Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = seleccionActual,
-            onValueChange = {},
-            label = { Text("Seleccionar") },
-            readOnly = true,
-            modifier = Modifier.fillMaxWidth(),
-            trailingIcon = {
-                IconButton(onClick = { expandir = !expandir }) {
-                    Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Default.ArrowDropDown,
-                        contentDescription = null
-                    )
-                }
-            }
-        )
-        DropdownMenu(
-            expanded = expandir,
-            onDismissRequest = { expandir = false },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            opciones.forEach { opcion ->
-                DropdownMenuItem(
-                    text = { Text(opcion) },
-                    onClick = {
-                        onSeleccion(opcion)
-                        expandir = false
+                        controller.guardarParada(parada)
+                        onVolver()
                     }
-                )
+                },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("GUARDAR", color = Color.White, fontWeight = FontWeight.Bold)
+            }
+
+            // Botón CANCELAR (negro)
+            Button(
+                onClick = onVolver,
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("CANCELAR", color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
     }
