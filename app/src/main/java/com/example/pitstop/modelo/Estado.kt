@@ -1,5 +1,5 @@
 package com.example.pitstop.modelo
 
-class Estado(
+data class Estado(
     val tipoEstado: String
 )

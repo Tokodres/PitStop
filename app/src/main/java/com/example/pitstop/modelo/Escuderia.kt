@@ -1,5 +1,5 @@
 package com.example.pitstop.modelo
 
-class Escuderia(
+data class Escuderia(
     val nombre: String
 )
