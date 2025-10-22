@@ -130,7 +130,7 @@ fun RegistrarParadaScreen(controller: PitStop_Controller, onVolver: () -> Unit) 
                         val parada = Parada(
                             piloto = Piloto(nombrePiloto),
                             escuderia = Escuderia(nombreEscuderia),
-                            tiempoSegundos = tiempoSegundos.toIntOrNull() ?: 0,
+                            tiempoSegundos = tiempoSegundos.replace(",", ".").toDoubleOrNull() ?: 0.0,
                             neumatico = Neumatico(
                                 tipo = tipoNeumatico,
                                 cantidad = cantidadNeumaticos.toIntOrNull() ?: 0
@@ -140,6 +140,7 @@ fun RegistrarParadaScreen(controller: PitStop_Controller, onVolver: () -> Unit) 
                             mecanico = Mecanico(nombreMecanico),
                             fecha = fechaManual
                         )
+
 
                         controller.guardarParada(parada)
                         onVolver()
