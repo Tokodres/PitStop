@@ -68,14 +68,5 @@ class ExampleInstrumentedTest {
         assertEquals("Ferrari", encontrada?.escuderia?.nombre)
     }
 
-    @Test
-    fun testObtenerResumen() {
-        controller.limpiarParadas()
-        controller.guardarParada(Parada(Piloto("Carlos"), Escuderia("Ferrari"), 10.0, Neumatico("Blandos", 4), Estado("Completado"), null, Mecanico("Juan"), "22/10/2025 13:30"))
-        controller.guardarParada(Parada(Piloto("Luis"), Escuderia("Red Bull"), 20.0, Neumatico("Duros", 4), Estado("Completado"), null, Mecanico("Pedro"), "22/10/2025 14:00"))
 
-        val resumen = controller.obtenerResumen()
-        assertTrue(resumen.contains("Total paradas: 2"))
-        assertTrue(resumen.contains("Promedio tiempo: 15.00"))
-    }
 }

@@ -46,8 +46,8 @@ fun PitStopApp(controller: PitStop_Controller) {
             controller = controller,
             onRegistrar = { pantallaActual = "registrar" },
             onLista = { pantallaActual = "lista" },
-            onResumen = { pantallaActual = "resumen" }
-        )
+
+            )
 
         "registrar" -> RegistrarParadaScreen(
             controller = controller,
@@ -65,22 +65,10 @@ fun PitStopApp(controller: PitStop_Controller) {
 fun DashboardPitStop(
     controller: PitStop_Controller,
     onRegistrar: () -> Unit,
-    onLista: () -> Unit,
-    onResumen: () -> Unit
+    onLista: () -> Unit
 ) {
-    var paradas by remember { mutableStateOf(controller.obtenerParadas()) }
-
-    // Recalcular automáticamente cuando cambien los datos
-    LaunchedEffect(Unit) {
-        paradas = controller.obtenerParadas()
-    }
-
-    val totalParadas = paradas.size
-    val promedioTiempo = if (paradas.isNotEmpty()) paradas.map { it.tiempoSegundos }.average() else 0.0
-    val paradaMasRapida = paradas.minByOrNull { it.tiempoSegundos }
-    val ultimaParada = paradas.lastOrNull()
-    val escuderiaMasFrecuente = paradas.groupBy { it.escuderia.nombre }
-        .maxByOrNull { it.value.size }?.key
+    // Obtenemos el resumen completo desde el controlador
+    val resumen = controller.obtenerResumen()
 
     Column(
         modifier = Modifier
@@ -97,39 +85,22 @@ fun DashboardPitStop(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        if (totalParadas == 0) {
-            Text("Aún no hay registros de Pit Stops.", fontSize = 18.sp)
+        if (resumen.containsKey("mensaje")) {
+            Text(
+                text = resumen["mensaje"] ?: "",
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp)
+            )
         } else {
-            // Lista de tarjetas con cada dato
-            InfoCard(
-                titulo = "📊 Total de Paradas",
-                valor = "$totalParadas"
-            )
-
-            InfoCard(
-                titulo = "⏱️ Promedio General",
-                valor = "%.2f segundos".format(promedioTiempo)
-            )
-
-            paradaMasRapida?.let {
-                InfoCard(
-                    titulo = "🏆 Pit Stop más rápido",
-                    valor = "${it.piloto.nombre} – ${it.tiempoSegundos}s"
-                )
-            }
-
-            escuderiaMasFrecuente?.let {
-                InfoCard(
-                    titulo = "🚗 Escudería más activa",
-                    valor = it
-                )
-            }
-
-            ultimaParada?.let {
-                InfoCard(
-                    titulo = "🧑‍🔧 Último Registro",
-                    valor = "${it.piloto.nombre} – ${it.fecha}"
-                )
+            resumen.forEach { (titulo, valor) ->
+                val titulo1 = when(titulo) {
+                    "Total paradas" -> "📊 $titulo"
+                    "Promedio tiempo" -> "⏱ $titulo"
+                    "Pit Stop más rápido" -> "🏆 $titulo"
+                    "Último registro" -> "🧑‍🔧 $titulo"
+                    "Escudería más activa" -> "🚗 $titulo"
+                    else -> titulo
+                }
+                InfoCard(titulo = titulo1, valor = valor)
             }
         }
 

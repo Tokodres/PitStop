@@ -24,15 +24,11 @@ import com.google.gson.reflect.TypeToken
 
 class PitStop_Controller(private val context: Context) {
 
-    // Objeto SharedPreferences para almacenar datos localmente
+    // Objeto SharedPreferences para que nuestros datos no se pierdan cuando acabe
     private val sharedPreferences = context.getSharedPreferences("pitstop_data", Context.MODE_PRIVATE)
-    // Gson para convertir objetos Kotlin a JSON y viceversa
+    // Gson para convertir objetos Kotlin a JSON  como string
     private val gson = Gson()
 
-    /**
-     * Guarda una nueva parada en la lista de paradas.
-     * @param parada Objeto Parada a guardar
-     */
     fun guardarParada(parada: Parada) {
         // Obtiene la lista actual de paradas
         val lista = obtenerParadas().toMutableList()
@@ -46,7 +42,7 @@ class PitStop_Controller(private val context: Context) {
 
     /**
      * Obtiene la lista completa de paradas almacenadas.
-     * @return Lista de objetos Parada. Si no hay registros, devuelve una lista vacía.
+     * @return Lista de objetos Parada. Si no hay registros, devuelve una lista vacía. - convierte de json a liosta
      */
     fun obtenerParadas(): List<Parada> {
         val json = sharedPreferences.getString("paradas", null)
@@ -82,7 +78,7 @@ class PitStop_Controller(private val context: Context) {
 
     /**
      * Busca una parada por el nombre del piloto.
-     * @param nombrePiloto Nombre del piloto a buscar
+     *  nombrePiloto Nombre del piloto a buscar
      * @return Objeto Parada si existe, o null si no se encuentra
      */
     fun buscarParadaPorPiloto(nombrePiloto: String): Parada? {
@@ -93,10 +89,29 @@ class PitStop_Controller(private val context: Context) {
      * Genera un resumen de todas las paradas registradas.
      * @return Texto con el total de paradas y el promedio de tiempo en segundos
      */
-    fun obtenerResumen(): String {
+    fun obtenerResumen(): Map<String, String> {
         val lista = obtenerParadas()
-        if (lista.isEmpty()) return "No hay registros disponibles."
+        if (lista.isEmpty()) return mapOf("mensaje" to "No hay registros disponibles.")
+
+        val totalParadas = lista.size
         val promedioTiempo = lista.map { it.tiempoSegundos }.average()
-        return "Total paradas: ${lista.size}\nPromedio tiempo: %.2f segundos".format(promedioTiempo)
+        val paradaMasRapida = lista.minByOrNull { it.tiempoSegundos }
+        val ultimaParada = lista.lastOrNull()
+        val escuderiaMasFrecuente = lista.groupBy { it.escuderia.nombre }
+            .maxByOrNull { it.value.size }?.key ?: "N/A"
+
+        val resumenMap = mutableMapOf<String, String>()
+        resumenMap["Total paradas"] = "$totalParadas"
+        resumenMap["Promedio tiempo"] = "%.2f segundos".format(promedioTiempo)
+        paradaMasRapida?.let {
+            resumenMap["Pit Stop más rápido"] = "${it.piloto.nombre} – ${it.tiempoSegundos}s"
+        }
+        resumenMap["Escudería más activa"] = escuderiaMasFrecuente
+        ultimaParada?.let {
+            resumenMap["Último registro"] = "${it.piloto.nombre} – ${it.fecha}"
+        }
+
+        return resumenMap
     }
+
 }
