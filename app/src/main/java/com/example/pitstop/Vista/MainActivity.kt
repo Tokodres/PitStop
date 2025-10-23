@@ -23,11 +23,13 @@ class MainActivity : ComponentActivity() {
         val controller = PitStop_Controller(this)
 
         setContent {
+
             MaterialTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    FondoPitStop()
                     PitStopApp(controller)
                 }
             }
@@ -53,11 +55,6 @@ fun PitStopApp(controller: PitStop_Controller) {
         )
 
         "lista" -> ListaParadasScreen(
-            controller = controller,
-            onVolver = { pantallaActual = "menu" }
-        )
-
-        "resumen" -> ResumenScreen(
             controller = controller,
             onVolver = { pantallaActual = "menu" }
         )
@@ -146,10 +143,6 @@ fun DashboardPitStop(
 
             Button(onClick = onLista, modifier = Modifier.fillMaxWidth()) {
                 Text("Ver Lista Completa")
-            }
-
-            Button(onClick = onResumen, modifier = Modifier.fillMaxWidth()) {
-                Text("Ver Resumen General")
             }
         }
     }
